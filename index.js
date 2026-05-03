@@ -1,167 +1,98 @@
+const x = 10 // Integer
+const y = 12.23 // Float
+const name = "Remi" // String
+const isExpired = false // Boolean
 
+const user1 = {
+    name: "Remi",
+    age: 30,
+    sex: "male",
+    isRegistered: true,
+    password: "remi123"
+} // Object
 
-// Populate navigations
-const navigations = [
-    {
-        icon:"fa-solid fa-house",
-        label:"Home",
-        onclick:()=>{}
-    },
-    {
-        icon:"fa-solid fa-gear",
-        label:"Settings",
-        onclick:()=>{}
-    },
-    {
-        icon:"fa-solid fa-envelope",
-        label:"Messages",
-        onclick:()=>{}
-    },
-    {
-        icon:"fa-solid fa-bookmark",
-        label:"Bookmarks",
-        onclick:()=>{
-            console.log('bookmark')
-        }
-    },
-    {
-        icon:"fa-solid fa-arrow-left",
-        label:"Logout",
-        onclick:()=>{
-            localStorage.removeItem("user")
-            window.location.href = "/"
-        }
-    },
-]
-
-const createNavigation = (nav)=>{
-    // 1. Ambil elemen navigation
-    const navigation = document.querySelector(".navigation")
-    // 2. Kita clone
-    const newNavigation = navigation.cloneNode(true)
-    // 3. kita isi icon dan juga label nya
-    const iconNavigation = newNavigation.querySelector("i")
-    iconNavigation.className = nav.icon
-
-    const labelNavigation = newNavigation.querySelector(".navigation-label")
-    labelNavigation.textContent = nav.label
-    // 4. adain onclick function
-    newNavigation.onclick = nav.onclick
-
-    // 5. kita append ke navigation container
-    const navigationContainer = document.querySelector(".navigation-container")
-    navigationContainer.appendChild(newNavigation)
+const user2 = {
+    name: "Budi",
+    age: 28,
+    sex: "male",
+    isRegistered: true,
+    password: "budi123"
 }
 
-for(let i=0; i < navigations.length ; i++){
-    createNavigation(navigations[i])
+const user3 = {
+    name: "Ellie",
+    age: 31,
+    sex: "female",
+    isRegistered: true,
+    password: "ellie123"
 }
 
-// Tweets
+const user4 = {
+    name: "Timi",
+    age: 22,
+    sex: "male",
+    isRegistered: true,
+    password: "timi123"
+}
 
-// 1. buat event listener di button-post onclick
-const buttonPost = document.querySelector(".button-post")
-// user, timestamp, content
+const user5 = {
+    name: "Amel",
+    age: 25,
+    sex: "female",
+    isRegistered: true,
+    password: "amel123"
+}
 
-const textareaInput = document.querySelector(".textarea-input")
+const users = [user1, user2, user3, user4, user5] // Array 
 
-const createTweet = (t)=>{
-    // 3. ambil tweet element
-    const tweet = document.querySelector(".tweet")
-    // 4. clone twee element
-    const newTweet = tweet.cloneNode(true)
-    // 5. modifkasi name, datetime, dan juga content
-    const name = newTweet.querySelector(".tweet-name")
-    name.textContent = t.user
+for(let i = 0; i < users.length; i++){
+    // console.log(`Hello, my name is ${users[i].name}, I'm ${users[i].age} years old`)
+} // Looping
 
-    const datetime = newTweet.querySelector(".tweet-datetime")
-    datetime.textContent = new Date(t.timestamp).toLocaleString()
 
-    const content = newTweet.querySelector(".tweet-content")
-    content.textContent = t.content
-    // 6. ambil tweet container element
-    const tweetsContainer = document.querySelector(".tweets-container")
-    // 7. Modifikasi style position dan juga z-index
-    newTweet.style.position = "relative"
-    newTweet.style.zIndex = "0"
-
-    // make tweet trash function
-    const tweetTrash = newTweet.querySelector(".tweet-trash")
-    tweetTrash.onclick = ()=>{
-        console.log('trash')
-        newTweet.remove()
-        
-        const tweetsString = localStorage.getItem("tweets")
-        const tweets = JSON.parse(tweetsString)
-
-        const newTweets = []
-        for(let i = 0; i < tweets.length; i++){
-            if(t.timestamp != tweets[i].timestamp){
-                newTweets.push(tweets[i])
-            }
+// DRY / Don't repeat yourself
+// Function
+const handleLogin = ()=>{
+    // 1. Kita coba ambil input username
+    const inputUsername = document.querySelector(".input-username")
+    // 2. Kita coba liat di database users kita, ada gak username nya?
+    let isUserFound = false
+    let foundUser = {} // Object
+    for(let i = 0; i < users.length; i++){
+        if(inputUsername.value == users[i].name){
+            isUserFound = true
+            foundUser = users[i]
         }
-        localStorage.setItem("tweets", JSON.stringify(newTweets))
     }
-
-    // 8. append new tweet element yang di buat ke contaienr
-    tweetsContainer.appendChild(newTweet)
-
-    // 9. reset textarea
-    textareaInput.value = ""
-}
-
-const storeTweet = (t)=>{
-    // 1. kita ambil tweets dari local storage
-    const tweetsString = localStorage.getItem("tweets")
-
-    // 2. check ada atau tidak tweets yang sudah di store
-    if(tweetsString){
-        // 3. Kalau udah pernah store tweets di localstorage
-        const tweets = JSON.parse(tweetsString)
-
-        const newTweets = []
-        
-        for(let i=0; i < tweets.length; i++){
-            newTweets.push(tweets[i])
+    if(isUserFound){
+        // 4. Kalo sampe ada, coba cek, password nya bener apa ngga?
+        const inputPassword = document.querySelector(".input-password")
+        if(inputPassword.value == foundUser.password){
+            // 6. kalo bener, berarti berhasil login.
+            window.location.href = "/tweets"
+            localStorage.setItem("user", foundUser.name)
         }
-        newTweets.push(t)
-        localStorage.setItem("tweets",JSON.stringify(newTweets))
+        else{
+            // 5. kalo ngga kasih tau password incorrect
+            const errorNotification = document.querySelector(".error-notification")
+            errorNotification.textContent = "Password incorrect"
+        }
     }
     else{
-        // 4. Kalau belum pernah
-        localStorage.setItem("tweets",JSON.stringify([t]))
-
+        // 3. Kalo gak ada berarti kasih tau, users not found
+        const errorNotification = document.querySelector(".error-notification")
+        errorNotification.textContent = "User not found"
     }
 }
 
-buttonPost.onclick = ()=>{
-    const newTweet = {
-        user:localStorage.getItem("user"),
-        timestamp:Date.now(),
-        content:textareaInput.value
+const loginButton = document.querySelector(".login-button")
+loginButton.onclick = ()=>{
+    handleLogin()
+}
+
+// Event listener for Enter keydown
+document.onkeydown = (e)=>{
+    if(e.code == "Enter"){
+        handleLogin()
     }
-    createTweet(newTweet)
-    storeTweet(newTweet)
-
-    // Animation
-    buttonPost.style.opacity = `100%`
-    setTimeout(()=>{
-        buttonPost.style.opacity = `75%`
-    },200)
-}
-
-// Populate tweets
-const tweetsString = localStorage.getItem("tweets")
-const tweets = JSON.parse(tweetsString)
-
-for(let i = 0; i < tweets.length ; i++){
-    createTweet(tweets[i])
-}
-
-// Post Button animation
-buttonPost.onmouseenter = ()=>{
-    buttonPost.style.opacity = `75%`
-}
-buttonPost.onmouseleave = ()=>{
-    buttonPost.style.opacity = `50%`
 }
